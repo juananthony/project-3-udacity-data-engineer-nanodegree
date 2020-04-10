@@ -119,26 +119,26 @@ CREDENTIALS 'aws_iam_role={}'
 format as json {}
 STATUPDATE ON
 region 'us-west-2'
-""").format(
+""".format(
     config.get("S3", "LOG_DATA"),
     config.get('IAM_ROLE', 'ARN'),
     config.get("S3", "LOG_JSONPATH")
-)
+))
 
 staging_songs_copy = ("""
 COPY staging_songs FROM {}
 CREDENTIALS 'aws_iam_role={}'
 format as json 'auto'
 region 'us-west-2'
-""").format(
+""".format(
     config.get("S3", "SONG_DATA"),
     config.get('IAM_ROLE', 'ARN')
-)
+))
 
 # FINAL TABLES
 
 songplay_table_insert = ("""
-INSERT INTO songplay PLAY (
+INSERT INTO songplay (
     start_time,
     user_id,
     level,
@@ -152,10 +152,10 @@ INSERT INTO songplay PLAY (
         TIMESTAMP 'epoch' + se.ts/1000 * INTERVAL '1 second'    AS start_time,
         se.userId                                               AS user_id,
         se.level                                                AS level,
-        ss.song_id                                              AS song_id
-        ss.artist_id                                            AS artist_id
-        se.sessionId                                            AS session_id
-        se.location                                             AS location
+        ss.song_id                                              AS song_id,
+        ss.artist_id                                            AS artist_id,
+        se.sessionId                                            AS session_id,
+        se.location                                             AS location,
         se.userAgent                                            AS user_agent
     FROM staging_events se
     JOIN staging_songs ss
@@ -236,7 +236,7 @@ INSERT INTO time (
         EXTRACT(week FROM start_time)                           AS week,
         EXTRACT(month FROM start_time)                          AS month,
         EXTRACT(year FROM start_time)                           AS year,
-        EXTRACT(weekday FROM start_time)                        AS weekday,
+        EXTRACT(weekday FROM start_time)                        AS weekday
     FROM staging_events se
     WHERE se.page = 'NextSong'
 );

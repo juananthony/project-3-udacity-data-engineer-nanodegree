@@ -1,18 +1,27 @@
 import configparser
 import psycopg2
+import progressbar
 from sql_queries import copy_table_queries, insert_table_queries
 
 
 def load_staging_tables(cur, conn):
-    for query in copy_table_queries:
+    print("Loading data into staging tables")
+    for i in progressbar.progressbar(range(len(copy_table_queries))):
+        query = copy_table_queries[i]
         cur.execute(query)
         conn.commit()
 
 
 def insert_tables(cur, conn):
-    for query in insert_table_queries:
-        cur.execute(query)
-        conn.commit()
+    print("Insert data from staging to DWH tables")
+    for i in progressbar.progressbar(range(len(insert_table_queries))):
+        query = insert_table_queries[i]
+        try:
+            cur.execute(query)
+            conn.commit()
+        except Exception as e:
+            print("Error processing insert statement: {}".format(query))
+            raise e
 
 
 def main():

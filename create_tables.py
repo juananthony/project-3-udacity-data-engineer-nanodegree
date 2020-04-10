@@ -1,16 +1,21 @@
 import configparser
 import psycopg2
+import progressbar
 from sql_queries import create_table_queries, drop_table_queries
 
 
 def drop_tables(cur, conn):
-    for query in drop_table_queries:
+    print("Dropping tables")
+    for i in progressbar.progressbar(range(len(drop_table_queries)), markers='|/-\\'):
+        query = drop_table_queries[i]
         cur.execute(query)
         conn.commit()
 
 
 def create_tables(cur, conn):
-    for query in create_table_queries:
+    print("Creating tables")
+    for i in progressbar.progressbar(range(len(drop_table_queries)), markers='|/-\\'):
+        query = create_table_queries[i]
         cur.execute(query)
         conn.commit()
 
