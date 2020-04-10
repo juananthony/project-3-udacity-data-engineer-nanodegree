@@ -38,7 +38,19 @@ And below is an example of what the data in a log file, `2018-11-12-events.json`
 
 ## ETL
 
+The log and song datasets are stored in a S3 Bucket. The first step in the ETL process is to move that data into staging staging tables in Amazon Redshift.
+
+![staging tables](./docs/imgs/staging.png)
+
+The ETL process split the data over all cluster machines. The strategy applied here is ALL distribution (also known as "broadcasting") because there is one fact table and some dimension ones. This strategy replicates small tables on all slices to speed up joins.
+
+![DWH fact table and dimensions](./docs/imgs/cube-er.png)
+
 ## Cloud Architecture
+
+The source data is stored in a S3 bucket and the first process is to store that data in the staging tables in Amazon Redshift. After that, 
+
+![AWS modules](./docs/imgs/architecture.png)
 
 ## Configuration
 
@@ -46,7 +58,7 @@ A `dwh.cfg` file is needed in the root of the project repository with the config
 
 ```
 [CLUSTER]
-HOST=""
+HOST=
 DB_NAME=
 DB_USER=
 DB_PASSWORD=
@@ -61,21 +73,11 @@ DWH_CLUSTER_TYPE=multi-node
 DWH_NUM_NODES=4
 DWH_NODE_TYPE=dc2.large
 
-DWH_IAM_ROLE_NAME=
-DWH_CLUSTER_IDENTIFIER=
-DWH_DB=
-DWH_DB_USER=
-DWH_DB_PASSWORD=
-DWH_PORT=
-
-DWH_ENDPOINT=""
-DWH_ROLE_ARN=""
-
 [IAM_ROLE]
-ARN=""
+ARN=
 
 [S3]
-LOG_DATA=''
-LOG_JSONPATH=''
-SONG_DATA=''
+LOG_DATA='s3://udacity-dend/log_data'
+LOG_JSONPATH='s3://udacity-dend/log_json_path.json'
+SONG_DATA='s3://udacity-dend/song_data'
 ```
